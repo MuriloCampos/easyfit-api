@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { internet, datatype } from 'faker';
@@ -105,22 +105,48 @@ describe('UsersService', () => {
   });
 
   describe('findOne', () => {
+    it('should throw an error when user is not found', async () => {
+      const id = datatype.uuid();
+      const repoSpy = jest
+        .spyOn(repository, 'findOne')
+        .mockResolvedValueOnce(null);
+
+      try {
+        await service.findOne(id);
+      } catch (error) {
+        expect(error).toBeInstanceOf(NotFoundException);
+        expect(error.message).toBe('No user found with the informed id.');
+        expect(repoSpy).toBeCalledWith({ id });
+      }
+    });
     it('should get a single user', () => {
       const id = datatype.uuid();
       const repoSpy = jest.spyOn(repository, 'findOne');
-      expect(service.findOne(id)).resolves.toEqual({ ...oneUser, id });
+      expect(service.findOne(id)).resolves.toEqual(oneUser);
       expect(repoSpy).toBeCalledWith({ id });
     });
   });
 
   describe('findOneByEmail', () => {
+    it('should throw an error when user is not found', async () => {
+      const email = internet.email();
+      const repoSpy = jest
+        .spyOn(repository, 'findOne')
+        .mockResolvedValueOnce(null);
+
+      try {
+        await service.findOneByEmail(email);
+      } catch (error) {
+        expect(error).toBeInstanceOf(NotFoundException);
+        expect(error.message).toBe('No user found with the informed e-mail.');
+        expect(repoSpy).toBeCalledWith({ email });
+      }
+    });
+
     it('should get one user back', () => {
       const email = internet.email();
       const repoSpy = jest.spyOn(repository, 'findOne');
-      expect(service.findOneByEmail(email)).resolves.toEqual({
-        ...oneUser,
-        email,
-      });
+      expect(service.findOneByEmail(email)).resolves.toEqual(oneUser);
       expect(repoSpy).toBeCalledWith({ email });
     });
   });
