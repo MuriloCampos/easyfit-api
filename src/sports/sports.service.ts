@@ -1,26 +1,34 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateSportDto } from './dto/create-sport.dto';
 import { UpdateSportDto } from './dto/update-sport.dto';
+import { Sport } from './entities/sport.entity';
 
 @Injectable()
 export class SportsService {
+  constructor(
+    @InjectRepository(Sport)
+    private sportsRepository: Repository<Sport>,
+  ) {}
+
   create(createSportDto: CreateSportDto) {
-    return 'This action adds a new sport';
+    return this.sportsRepository.save(createSportDto);
   }
 
   findAll() {
-    return `This action returns all sports`;
+    return this.sportsRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} sport`;
+  findOne(id: string) {
+    return this.sportsRepository.findOne(id);
   }
 
-  update(id: number, updateSportDto: UpdateSportDto) {
+  update(id: string, updateSportDto: UpdateSportDto) {
     return `This action updates a #${id} sport`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} sport`;
   }
 }

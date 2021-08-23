@@ -8,7 +8,7 @@ import { StudentsModule } from './students/students.module';
 import { SportsModule } from './sports/sports.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(), UsersModule, StudentsModule],
+  imports: [TypeOrmModule.forRoot(), UsersModule, StudentsModule, SportsModule],
   controllers: [AppController],
   providers: [AppService],
 })
