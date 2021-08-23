@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { StudentsModule } from './students/students.module';
+import { SportsModule } from './sports/sports.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot(), UsersModule, StudentsModule],
