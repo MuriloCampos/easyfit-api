@@ -5,5 +5,6 @@ export class CreateStudentDto {
   gender: 'male' | 'female' | 'not informed';
   goals: string;
   sports: string[];
+  name: string;
   email: string;
 }

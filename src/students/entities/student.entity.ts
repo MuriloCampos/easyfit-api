@@ -17,16 +17,10 @@ export class Student {
   id: string;
 
   @Column()
-  age: number;
-
-  @Column()
   weight: number;
 
   @Column()
   height: number;
-
-  @Column()
-  gender: 'male' | 'female' | 'not informed';
 
   @Column()
   goals: string;
@@ -49,17 +43,9 @@ export class Student {
   @JoinTable()
   sports: Sport[];
 
-  constructor(
-    age?: number,
-    weight?: number,
-    height?: number,
-    goals?: string,
-    gender?: 'male' | 'female' | 'not informed',
-  ) {
-    this.age = age || 0;
+  constructor(weight?: number, height?: number, goals?: string) {
     this.weight = weight || 0;
     this.height = height || 0;
     this.goals = goals || '';
-    this.gender = gender || 'not informed';
   }
 }

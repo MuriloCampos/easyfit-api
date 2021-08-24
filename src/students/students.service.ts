@@ -1,9 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { Student } from './entities/student.entity';
 import { Sport } from 'src/sports/entities/sport.entity';
 import { SportsService } from 'src/sports/sports.service';
@@ -15,29 +21,45 @@ export class StudentsService {
     private studentsRepository: Repository<Student>,
     private usersService: UsersService,
     private sportsService: SportsService,
+    private connection: Connection,
   ) {}
 
   async create(createStudentDto: CreateStudentDto) {
-    const { age, weight, height, gender, goals, sports, email } =
+    const { age, weight, height, gender, goals, sports, email, name } =
       createStudentDto;
 
-    const user = await this.usersService.create({
-      email,
-    });
+    const queryRunner = this.connection.createQueryRunner();
 
-    const userSports = new Array<Sport>();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    for (let i = 0; i < sports.length; i++) {
-      const newSport = await this.sportsService.findOne(sports[i]);
-      userSports.push(newSport);
+    try {
+      const user = await this.usersService.create({
+        email,
+        gender,
+        name,
+        age,
+      });
+
+      const userSports = new Array<Sport>();
+
+      for (let i = 0; i < sports.length; i++) {
+        const newSport = await this.sportsService.findOne(sports[i]);
+        userSports.push(newSport);
+      }
+
+      const student = new Student(weight, height, goals);
+
+      student.user = user;
+      student.sports = [...userSports];
+
+      return this.studentsRepository.save(student);
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    } finally {
+      await queryRunner.release();
     }
-
-    const student = new Student(age, weight, height, goals, gender);
-
-    student.user = user;
-    student.sports = [...userSports];
-
-    return this.studentsRepository.save(student);
   }
 
   findAll() {
@@ -68,13 +90,16 @@ export class StudentsService {
       userSports.push(newSport);
     }
 
+    const updatedUser = student.user;
+    updatedUser.gender = gender;
+    updatedUser.age = age;
+
     student = {
       ...student,
-      age,
       weight,
       height,
-      gender,
       goals,
+      user: updatedUser,
       sports: [...userSports],
     };
 
