@@ -37,11 +37,15 @@ export class Student {
   @CreateDateColumn({ type: 'timestamp' })
   updated_at: Date;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, {
+    eager: true,
+  })
   @JoinColumn()
   user: User;
 
-  @ManyToMany(() => Sport)
+  @ManyToMany(() => Sport, {
+    eager: true,
+  })
   @JoinTable()
   sports: Sport[];
 }

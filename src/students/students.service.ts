@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
@@ -27,10 +27,10 @@ export class StudentsService {
 
     const userSports = new Array<Sport>();
 
-    sports.forEach(async (sport) => {
-      const newSport = await this.sportsService.findOne(sport);
+    for (let i = 0; i < sports.length; i++) {
+      const newSport = await this.sportsService.findOne(sports[i]);
       userSports.push(newSport);
-    });
+    }
 
     const student = new Student();
 
@@ -40,7 +40,7 @@ export class StudentsService {
     student.gender = gender;
     student.goals = goals;
     student.user = user;
-    student.sports = userSports;
+    student.sports = [...userSports];
 
     return this.studentsRepository.save(student);
   }
@@ -49,15 +49,46 @@ export class StudentsService {
     return this.studentsRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} student`;
+  findOne(id: string) {
+    return this.studentsRepository.findOne(id);
   }
 
-  update(id: number, updateStudentDto: UpdateStudentDto) {
-    return `This action updates a #${id} student`;
+  async findOneByEmail(email: string) {
+    const user = await this.usersService.findOneByEmail(email);
+    return this.studentsRepository.findOne({ user: user });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} student`;
+  async update(id: string, updateStudentDto: UpdateStudentDto) {
+    const { age, weight, height, gender, goals, sports } = updateStudentDto;
+    const student = await this.studentsRepository.findOne(id);
+
+    if (!student) {
+      throw new NotFoundException('No student found with the informed id.');
+    }
+
+    const userSports = new Array<Sport>();
+
+    for (let i = 0; i < sports.length; i++) {
+      const newSport = await this.sportsService.findOne(sports[i]);
+      userSports.push(newSport);
+    }
+
+    student.age = age;
+    student.weight = weight;
+    student.height = height;
+    student.gender = gender;
+    student.goals = goals;
+    student.sports = [...userSports];
+
+    return this.studentsRepository.save(student);
+  }
+
+  async remove(id: string) {
+    const student = await this.findOne(id);
+    const userToRemove = student.user;
+    await this.studentsRepository.remove(student);
+    await this.usersService.remove(userToRemove.id);
+
+    return { deleted: true };
   }
 }
