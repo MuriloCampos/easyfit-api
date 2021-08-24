@@ -25,10 +25,10 @@ export class SportsService {
   }
 
   update(id: string, updateSportDto: UpdateSportDto) {
-    return `This action updates a #${id} sport`;
+    return this.update(id, updateSportDto);
   }
 
   remove(id: string) {
-    return `This action removes a #${id} sport`;
+    return this.remove(id);
   }
 }

@@ -48,4 +48,18 @@ export class Student {
   })
   @JoinTable()
   sports: Sport[];
+
+  constructor(
+    age?: number,
+    weight?: number,
+    height?: number,
+    goals?: string,
+    gender?: 'male' | 'female' | 'not informed',
+  ) {
+    this.age = age || 0;
+    this.weight = weight || 0;
+    this.height = height || 0;
+    this.goals = goals || '';
+    this.gender = gender || 'not informed';
+  }
 }

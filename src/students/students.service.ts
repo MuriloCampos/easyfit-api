@@ -32,13 +32,8 @@ export class StudentsService {
       userSports.push(newSport);
     }
 
-    const student = new Student();
+    const student = new Student(age, weight, height, goals, gender);
 
-    student.age = age;
-    student.weight = weight;
-    student.height = height;
-    student.gender = gender;
-    student.goals = goals;
     student.user = user;
     student.sports = [...userSports];
 
@@ -60,7 +55,7 @@ export class StudentsService {
 
   async update(id: string, updateStudentDto: UpdateStudentDto) {
     const { age, weight, height, gender, goals, sports } = updateStudentDto;
-    const student = await this.studentsRepository.findOne(id);
+    let student = await this.studentsRepository.findOne(id);
 
     if (!student) {
       throw new NotFoundException('No student found with the informed id.');
@@ -73,12 +68,15 @@ export class StudentsService {
       userSports.push(newSport);
     }
 
-    student.age = age;
-    student.weight = weight;
-    student.height = height;
-    student.gender = gender;
-    student.goals = goals;
-    student.sports = [...userSports];
+    student = {
+      ...student,
+      age,
+      weight,
+      height,
+      gender,
+      goals,
+      sports: [...userSports],
+    };
 
     return this.studentsRepository.save(student);
   }
