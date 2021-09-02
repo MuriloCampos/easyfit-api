@@ -18,4 +18,8 @@ export class Sport {
 
   @CreateDateColumn({ type: 'timestamp' })
   updated_at: Date;
+
+  constructor(name?: string) {
+    this.name = name || '';
+  }
 }

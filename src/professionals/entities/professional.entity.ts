@@ -12,18 +12,12 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class Student {
+export class Professional {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
-  weight: number;
-
-  @Column()
-  height: number;
-
-  @Column()
-  goals: string;
+  bio: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
@@ -41,11 +35,9 @@ export class Student {
     eager: true,
   })
   @JoinTable()
-  sports: Sport[];
+  expertise: Sport[];
 
-  constructor(weight?: number, height?: number, goals?: string) {
-    this.weight = weight || 0;
-    this.height = height || 0;
-    this.goals = goals || '';
+  constructor(bio?: string) {
+    this.bio = bio || '';
   }
 }

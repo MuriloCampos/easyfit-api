@@ -16,14 +16,20 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
-    const { email } = createUserDto;
+  async create(createUserDto: CreateUserDto) {
+    const { email, name, gender, age } = createUserDto;
 
     if (!email) {
       throw new BadRequestException('E-mail is required.');
     }
 
-    const user = new User(email);
+    const userExists = await this.usersRepository.findOne({ email });
+
+    if (userExists) {
+      throw new BadRequestException('User already exists.');
+    }
+
+    const user = new User(email, name, age, gender);
 
     return this.usersRepository.save(user);
   }
@@ -62,6 +68,6 @@ export class UsersService {
   }
 
   update(id: string, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    return this.usersRepository.update(id, updateUserDto);
   }
 }

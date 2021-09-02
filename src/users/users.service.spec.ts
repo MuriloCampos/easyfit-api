@@ -1,7 +1,7 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { internet, datatype } from 'faker';
+import { internet, datatype, name } from 'faker';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
@@ -11,24 +11,36 @@ const userArray = [
   {
     id: datatype.uuid(),
     email: internet.email(),
+    name: name.firstName(),
+    gender: 'not informed',
+    age: datatype.number(),
     created_at: new Date(),
     updated_at: new Date(),
   },
   {
     id: datatype.uuid(),
     email: internet.email(),
+    name: name.firstName(),
+    gender: 'not informed',
+    age: datatype.number(),
     created_at: new Date(),
     updated_at: new Date(),
   },
   {
     id: datatype.uuid(),
     email: internet.email(),
+    name: name.firstName(),
+    gender: 'not informed',
+    age: datatype.number(),
     created_at: new Date(),
     updated_at: new Date(),
   },
   {
     id: datatype.uuid(),
     email: internet.email(),
+    name: name.firstName(),
+    gender: 'not informed',
+    age: datatype.number(),
     created_at: new Date(),
     updated_at: new Date(),
   },
@@ -37,8 +49,18 @@ const userArray = [
 const oneUser = {
   id: datatype.uuid(),
   email: internet.email(),
+  name: name.firstName(),
+  gender: 'not informed',
+  age: datatype.number(),
   created_at: new Date(),
   updated_at: new Date(),
+};
+
+const mockedRepo = {
+  save: jest.fn(() => Promise.resolve(oneUser)),
+  find: jest.fn(() => Promise.resolve(userArray)),
+  delete: jest.fn(() => Promise.resolve(true)),
+  findOne: jest.fn(() => Promise.resolve(oneUser)),
 };
 
 describe('UsersService', () => {
@@ -51,12 +73,7 @@ describe('UsersService', () => {
         UsersService,
         {
           provide: getRepositoryToken(User),
-          useValue: {
-            find: jest.fn().mockResolvedValue(userArray),
-            save: jest.fn().mockResolvedValue(oneUser),
-            delete: jest.fn().mockResolvedValue(true),
-            findOne: jest.fn().mockResolvedValue(oneUser),
-          },
+          useValue: mockedRepo,
         },
       ],
     }).compile();
@@ -69,30 +86,36 @@ describe('UsersService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('creating a user', () => {
-    it('throws an error when no e-mail is provided', async () => {
-      expect.assertions(2);
-
+  describe('createUser', () => {
+    it('should throw an error when no e-mail is provided', async () => {
       try {
-        await service.create({ email: '' });
+        await service.create({
+          email: '',
+          gender: 'not informed',
+          age: datatype.number(),
+          name: name.firstName(),
+        });
       } catch (error) {
         expect(error).toBeInstanceOf(BadRequestException);
         expect(error.message).toBe('E-mail is required.');
       }
     });
 
-    it('successfully creates an user', async () => {
+    it('should successfully create a user', async () => {
       const email = internet.email();
 
-      const createUserDto: CreateUserDto = { email };
+      const createUserDto: CreateUserDto = {
+        email,
+        name: name.firstName(),
+        gender: 'not informed',
+        age: datatype.number(),
+      };
 
-      const savedUserEntity = new User(email);
-      savedUserEntity.id = datatype.uuid();
-      savedUserEntity.created_at = new Date();
-      savedUserEntity.updated_at = new Date();
+      jest.spyOn(repository, 'findOne').mockResolvedValueOnce(null);
 
-      expect(service.create(createUserDto)).resolves.toEqual(oneUser);
-      expect(repository.save).toBeCalledTimes(1);
+      const result = await service.create(createUserDto);
+
+      expect(result).toEqual(oneUser);
       expect(repository.save).toBeCalledWith(createUserDto);
     });
   });
@@ -101,6 +124,7 @@ describe('UsersService', () => {
     it('should return an array of users', async () => {
       const users = await service.findAll();
       expect(users).toEqual(userArray);
+      expect(repository.find).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -164,7 +188,6 @@ describe('UsersService', () => {
         message: 'Bad Delete Method.',
       });
       expect(repoSpy).toBeCalledWith({ id: 'a bad uuid' });
-      expect(repoSpy).toBeCalledTimes(1);
     });
   });
 });
