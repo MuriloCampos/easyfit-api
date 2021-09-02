@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { internet, datatype } from 'faker';
+import { internet, datatype, name, random } from 'faker';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
@@ -8,24 +8,36 @@ const userArray = [
   {
     id: datatype.uuid(),
     email: internet.email(),
+    name: name.firstName(),
+    gender: 'not informed',
+    age: datatype.number(),
     created_at: new Date(),
     updated_at: new Date(),
   },
   {
     id: datatype.uuid(),
     email: internet.email(),
+    name: name.firstName(),
+    gender: 'not informed',
+    age: datatype.number(),
     created_at: new Date(),
     updated_at: new Date(),
   },
   {
     id: datatype.uuid(),
     email: internet.email(),
+    name: name.firstName(),
+    gender: 'not informed',
+    age: datatype.number(),
     created_at: new Date(),
     updated_at: new Date(),
   },
   {
     id: datatype.uuid(),
     email: internet.email(),
+    name: name.firstName(),
+    gender: 'not informed',
+    age: datatype.number(),
     created_at: new Date(),
     updated_at: new Date(),
   },
@@ -34,6 +46,9 @@ const userArray = [
 const oneUser = {
   id: datatype.uuid(),
   email: internet.email(),
+  name: name.firstName(),
+  gender: 'not informed',
+  age: datatype.number(),
   created_at: new Date(),
   updated_at: new Date(),
 };
@@ -100,7 +115,7 @@ describe('UsersController', () => {
 
       const getByEmailSpy = jest
         .spyOn(service, 'findOneByEmail')
-        .mockResolvedValueOnce({ ...oneUser, email });
+        .mockResolvedValueOnce({ ...oneUser, email, gender: 'not informed' });
 
       await expect(controller.findOneByEmail(email)).resolves.toEqual({
         ...oneUser,
@@ -116,6 +131,9 @@ describe('UsersController', () => {
       const email = internet.email();
       const newUserDto: CreateUserDto = {
         email,
+        name: name.firstName(),
+        gender: 'not informed',
+        age: datatype.number(),
       };
       await expect(controller.create(newUserDto)).resolves.toEqual({
         ...oneUser,

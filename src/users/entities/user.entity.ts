@@ -11,10 +11,10 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ nullable: false })
   name: string;
 
-  @PrimaryColumn()
+  @Column({ nullable: false })
   email: string;
 
   @Column()

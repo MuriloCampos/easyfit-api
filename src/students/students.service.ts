@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -90,16 +89,16 @@ export class StudentsService {
       userSports.push(newSport);
     }
 
-    const updatedUser = student.user;
-    updatedUser.gender = gender;
-    updatedUser.age = age;
+    await this.usersService.update(student.user.id, {
+      gender,
+      age,
+    });
 
     student = {
       ...student,
       weight,
       height,
       goals,
-      user: updatedUser,
       sports: [...userSports],
     };
 
@@ -108,6 +107,10 @@ export class StudentsService {
 
   async remove(id: string) {
     const student = await this.findOne(id);
+
+    if (!student) {
+      throw new NotFoundException('Student not found.');
+    }
     const userToRemove = student.user;
     await this.studentsRepository.remove(student);
     await this.usersService.remove(userToRemove.id);
