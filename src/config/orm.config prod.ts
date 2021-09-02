@@ -16,5 +16,8 @@ export default registerAs(
     database: process.env.DB_NAME,
     entities: [Professional, Sport, Student, User],
     synchronize: false,
+    extra: {
+      ssl: true,
+    },
   }),
 );
