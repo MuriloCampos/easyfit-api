@@ -10,7 +10,7 @@ export default registerAs(
   (): TypeOrmModuleOptions => ({
     type: 'postgres',
     entities: [Professional, Sport, Student, User],
-    synchronize: false,
+    synchronize: true,
     url: process.env.DATABASE_URL,
     extra: {
       ssl: {
