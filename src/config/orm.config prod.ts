@@ -13,7 +13,9 @@ export default registerAs(
     synchronize: false,
     url: process.env.DATABASE_URL,
     extra: {
-      ssl: true,
+      ssl: {
+        rejectUnauthorized: false,
+      },
     },
   }),
 );
