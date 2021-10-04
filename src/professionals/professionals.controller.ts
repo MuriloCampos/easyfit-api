@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ProfessionalsService } from './professionals.service';
 import { CreateProfessionalDto } from './dto/create-professional.dto';
@@ -25,9 +26,14 @@ export class ProfessionalsController {
     return this.professionalsService.findAll();
   }
 
+  @Get('/filter')
+  findOneByEmail(@Query() query) {
+    return this.professionalsService.findByFilter(query);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.professionalsService.findOne(+id);
+    return this.professionalsService.findOne(id);
   }
 
   @Patch(':id')

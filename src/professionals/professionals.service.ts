@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Sport } from 'src/sports/entities/sport.entity';
 import { SportsService } from 'src/sports/sports.service';
 import { UsersService } from 'src/users/users.service';
-import { Connection, Repository } from 'typeorm';
+import { Connection, In, Like, Repository } from 'typeorm';
 import { CreateProfessionalDto } from './dto/create-professional.dto';
 import { UpdateProfessionalDto } from './dto/update-professional.dto';
 import { Professional } from './entities/professional.entity';
@@ -59,8 +59,45 @@ export class ProfessionalsService {
     return this.professionalsRepository.find();
   }
 
-  findOne(id: number) {
-    return this.findOne(id);
+  findOne(id: string) {
+    return this.professionalsRepository.findOne(id);
+  }
+
+  async findByFilter(filters) {
+    if (filters.sport && !filters.name) {
+      const filteredProfessionals = await this.professionalsRepository
+        .createQueryBuilder('professional')
+        .leftJoin('professional.expertise', 'expertise')
+        .where('expertise.id = :id', { id: filters.sport })
+        .getMany();
+
+      const ids = filteredProfessionals.map(
+        (filteredProfessional) => filteredProfessional.id,
+      );
+
+      return this.professionalsRepository.find({ where: { id: In(ids) } });
+    } else if (!filters.sport && filters.name) {
+      return this.professionalsRepository.find({
+        where: {
+          user: { name: Like(`%${filters.name}%`) },
+        },
+        relations: ['user'],
+      });
+    }
+
+    const filteredProfessionals = await this.professionalsRepository
+      .createQueryBuilder('professional')
+      .leftJoin('professional.expertise', 'expertise')
+      .leftJoin('professional.user', 'user')
+      .where('expertise.id = :id', { id: filters.sport })
+      .andWhere('user.name like :name', { name: `%${filters.name}%` })
+      .getMany();
+
+    const ids = filteredProfessionals.map(
+      (filteredProfessional) => filteredProfessional.id,
+    );
+
+    return this.professionalsRepository.find({ where: { id: In(ids) } });
   }
 
   update(id: number, updateProfessionalDto: UpdateProfessionalDto) {
