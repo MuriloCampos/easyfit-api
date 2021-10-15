@@ -17,6 +17,10 @@ export class CreateProfessionalDto {
   @Length(5, 255)
   name: string;
 
+  @ApiProperty()
+  @Length(5, 255)
+  avatar_url: string;
+
   @Length(5, 500)
   @ApiProperty()
   bio: string;

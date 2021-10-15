@@ -3,7 +3,6 @@ import {
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
-  PrimaryColumn,
 } from 'typeorm';
 
 @Entity()
@@ -16,6 +15,9 @@ export class User {
 
   @Column({ nullable: false })
   email: string;
+
+  @Column({ type: 'varchar', default: 'abc', nullable: true })
+  avatar_url: string;
 
   @Column()
   gender: 'male' | 'female' | 'not informed';
@@ -34,10 +36,12 @@ export class User {
     name?: string,
     age?: number,
     gender?: 'male' | 'female' | 'not informed',
+    avatar_url?: string,
   ) {
     this.email = email || '';
     this.name = name || '';
     this.gender = gender || 'not informed';
     this.age = age || 0;
+    this.avatar_url = avatar_url || '';
   }
 }

@@ -24,8 +24,17 @@ export class StudentsService {
   ) {}
 
   async create(createStudentDto: CreateStudentDto) {
-    const { age, weight, height, gender, goals, sports, email, name } =
-      createStudentDto;
+    const {
+      age,
+      weight,
+      height,
+      gender,
+      goals,
+      sports,
+      email,
+      name,
+      avatar_url,
+    } = createStudentDto;
 
     const queryRunner = this.connection.createQueryRunner();
 
@@ -38,6 +47,7 @@ export class StudentsService {
         gender,
         name,
         age,
+        avatar_url,
       });
 
       const userSports = new Array<Sport>();
