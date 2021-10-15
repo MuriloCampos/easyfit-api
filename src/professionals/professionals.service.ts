@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Sport } from 'src/sports/entities/sport.entity';
 import { SportsService } from 'src/sports/sports.service';
 import { UsersService } from 'src/users/users.service';
-import { Connection, In, Like, Repository } from 'typeorm';
+import { Connection, ILike, In, Like, Repository } from 'typeorm';
 import { CreateProfessionalDto } from './dto/create-professional.dto';
 import { UpdateProfessionalDto } from './dto/update-professional.dto';
 import { Professional } from './entities/professional.entity';
@@ -18,8 +18,11 @@ export class ProfessionalsService {
     private connection: Connection,
   ) {}
 
+  ITEMS_PER_PAGE = 10;
+
   async create(createProfessionalDto: CreateProfessionalDto) {
-    const { age, gender, expertise, email, name, bio } = createProfessionalDto;
+    const { age, gender, expertise, email, name, bio, avatar_url } =
+      createProfessionalDto;
 
     const queryRunner = this.connection.createQueryRunner();
 
@@ -32,6 +35,7 @@ export class ProfessionalsService {
         gender,
         name,
         age,
+        avatar_url,
       });
 
       const professionalExpertise = new Array<Sport>();
@@ -55,8 +59,22 @@ export class ProfessionalsService {
     }
   }
 
-  findAll() {
-    return this.professionalsRepository.find();
+  async findAll(page: number) {
+    const skippedItems = (page - 1) * this.ITEMS_PER_PAGE;
+    const totalCount = await this.professionalsRepository.count();
+    const data = await this.professionalsRepository
+      .createQueryBuilder('professional')
+      .leftJoinAndSelect('professional.user', 'user')
+      .leftJoinAndSelect('professional.expertise', 'expertise')
+      .skip(skippedItems)
+      .take(this.ITEMS_PER_PAGE)
+      .getMany();
+
+    return {
+      data,
+      page,
+      totalCount,
+    };
   }
 
   findOne(id: string) {
@@ -64,6 +82,9 @@ export class ProfessionalsService {
   }
 
   async findByFilter(filters) {
+    console.log(filters);
+    const skippedItems = (filters.page - 1) * this.ITEMS_PER_PAGE;
+
     if (filters.sport && !filters.name) {
       const filteredProfessionals = await this.professionalsRepository
         .createQueryBuilder('professional')
@@ -75,14 +96,45 @@ export class ProfessionalsService {
         (filteredProfessional) => filteredProfessional.id,
       );
 
-      return this.professionalsRepository.find({ where: { id: In(ids) } });
+      const totalCount = (
+        await this.professionalsRepository.find({ where: { id: In(ids) } })
+      ).length;
+
+      const data = await this.professionalsRepository.find({
+        where: { id: In(ids) },
+        skip: skippedItems,
+        take: this.ITEMS_PER_PAGE,
+      });
+
+      return {
+        data,
+        page: filters.page,
+        totalCount,
+      };
     } else if (!filters.sport && filters.name) {
-      return this.professionalsRepository.find({
+      const totalCount = (
+        await this.professionalsRepository.find({
+          where: {
+            user: { name: Like(`%${filters.name}%`) },
+          },
+          relations: ['user'],
+        })
+      ).length;
+
+      const data = await this.professionalsRepository.find({
         where: {
-          user: { name: Like(`%${filters.name}%`) },
+          user: { name: ILike(`%${filters.name}%`) },
         },
+        skip: skippedItems,
+        take: this.ITEMS_PER_PAGE,
         relations: ['user'],
       });
+
+      return {
+        data,
+        page: filters.page,
+        totalCount,
+      };
     }
 
     const filteredProfessionals = await this.professionalsRepository
@@ -90,14 +142,28 @@ export class ProfessionalsService {
       .leftJoin('professional.expertise', 'expertise')
       .leftJoin('professional.user', 'user')
       .where('expertise.id = :id', { id: filters.sport })
-      .andWhere('user.name like :name', { name: `%${filters.name}%` })
+      .andWhere('user.name ilike :name', { name: `%${filters.name}%` })
       .getMany();
 
     const ids = filteredProfessionals.map(
       (filteredProfessional) => filteredProfessional.id,
     );
 
-    return this.professionalsRepository.find({ where: { id: In(ids) } });
+    const totalCount = (
+      await this.professionalsRepository.find({ where: { id: In(ids) } })
+    ).length;
+
+    const data = await this.professionalsRepository.find({
+      where: { id: In(ids) },
+      skip: skippedItems,
+      take: this.ITEMS_PER_PAGE,
+    });
+
+    return {
+      data,
+      page: filters.page,
+      totalCount,
+    };
   }
 
   update(id: number, updateProfessionalDto: UpdateProfessionalDto) {

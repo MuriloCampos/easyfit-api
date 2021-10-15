@@ -17,7 +17,7 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const { email, name, gender, age } = createUserDto;
+    const { email, name, gender, age, avatar_url } = createUserDto;
 
     if (!email) {
       throw new BadRequestException('E-mail is required.');
@@ -29,7 +29,7 @@ export class UsersService {
       throw new BadRequestException('User already exists.');
     }
 
-    const user = new User(email, name, age, gender);
+    const user = new User(email, name, age, gender, avatar_url);
 
     return this.usersRepository.save(user);
   }

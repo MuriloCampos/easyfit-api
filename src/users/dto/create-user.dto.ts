@@ -3,4 +3,5 @@ export class CreateUserDto {
   gender: 'male' | 'female' | 'not informed';
   name: string;
   age: number;
+  avatar_url: string;
 }

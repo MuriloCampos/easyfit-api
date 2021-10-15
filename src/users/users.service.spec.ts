@@ -94,6 +94,7 @@ describe('UsersService', () => {
           gender: 'not informed',
           age: datatype.number(),
           name: name.firstName(),
+          avatar_url: internet.domainName(),
         });
       } catch (error) {
         expect(error).toBeInstanceOf(BadRequestException);
@@ -109,6 +110,7 @@ describe('UsersService', () => {
         name: name.firstName(),
         gender: 'not informed',
         age: datatype.number(),
+        avatar_url: internet.domainName(),
       };
 
       jest.spyOn(repository, 'findOne').mockResolvedValueOnce(null);

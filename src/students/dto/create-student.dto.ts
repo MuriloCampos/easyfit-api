@@ -23,6 +23,10 @@ export class CreateStudentDto {
   goals: string;
 
   @ApiProperty()
+  @Length(5, 255)
+  avatar_url: string;
+
+  @ApiProperty()
   sports: string[];
 
   @ApiProperty()
