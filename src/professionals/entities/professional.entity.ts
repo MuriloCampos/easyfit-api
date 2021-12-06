@@ -19,6 +19,12 @@ export class Professional {
   @Column()
   bio: string;
 
+  @Column()
+  working_hours: string;
+
+  @Column()
+  hour_rate: number;
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
@@ -34,6 +40,7 @@ export class Professional {
   @ManyToMany(() => Sport, {
     eager: true,
   })
+
   @JoinTable()
   expertise: Sport[];
 

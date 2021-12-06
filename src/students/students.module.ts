@@ -10,5 +10,6 @@ import { SportsModule } from 'src/sports/sports.module';
   imports: [TypeOrmModule.forFeature([Student]), UsersModule, SportsModule],
   controllers: [StudentsController],
   providers: [StudentsService],
+  exports: [StudentsService],
 })
 export class StudentsModule {}

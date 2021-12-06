@@ -4,6 +4,7 @@ import { Professional } from 'src/professionals/entities/professional.entity';
 import { Sport } from 'src/sports/entities/sport.entity';
 import { Student } from 'src/students/entities/student.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Class } from 'src/classes/entities/class.entity';
 
 export default registerAs(
   'orm.config',
@@ -14,7 +15,7 @@ export default registerAs(
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    entities: [Professional, Sport, Student, User],
+    entities: [Professional, Sport, Student, User, Class],
     synchronize: true,
   }),
 );

@@ -21,8 +21,8 @@ export class ProfessionalsService {
   ITEMS_PER_PAGE = 10;
 
   async create(createProfessionalDto: CreateProfessionalDto) {
-    const { age, gender, expertise, email, name, bio, avatar_url } =
-      createProfessionalDto;
+    const { age, gender, expertise, email, name, 
+      bio, avatar_url, hour_rate, working_hours } = createProfessionalDto;
 
     const queryRunner = this.connection.createQueryRunner();
 
@@ -49,6 +49,8 @@ export class ProfessionalsService {
 
       professional.user = user;
       professional.expertise = [...professionalExpertise];
+      professional.hour_rate = hour_rate
+      professional.working_hours = working_hours
 
       return this.professionalsRepository.save(professional);
     } catch (error) {
