@@ -31,6 +31,7 @@
     "@types/faker": "^5.5.8",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
+    "date-fns": "^2.27.0",
     "faker": "^5.5.3",
     "pg": "^8.7.1",
     "reflect-metadata": "^0.1.13",

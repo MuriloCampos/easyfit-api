@@ -14,5 +14,6 @@ import { SportsModule } from 'src/sports/sports.module';
   ],
   controllers: [ProfessionalsController],
   providers: [ProfessionalsService],
+  exports: [ProfessionalsService],
 })
 export class ProfessionalsModule {}

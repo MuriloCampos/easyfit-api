@@ -8,6 +8,7 @@ import { StudentsModule } from './students/students.module';
 import { SportsModule } from './sports/sports.module';
 import { ProfessionalsModule } from './professionals/professionals.module';
 import { ConfigModule } from '@nestjs/config';
+import { ClassesModule } from './classes/classes.module';
 import ormConfig from './config/orm.config';
 import ormConfigProd from './config/orm.config prod';
 
@@ -25,6 +26,7 @@ import ormConfigProd from './config/orm.config prod';
     StudentsModule,
     SportsModule,
     ProfessionalsModule,
+    ClassesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -28,4 +28,10 @@ export class CreateProfessionalDto {
   @ApiProperty()
   @Length(5, 255)
   email: string;
+
+  @ApiProperty()
+  working_hours: string;
+
+  @ApiProperty()
+  hour_rate: number;
 }
