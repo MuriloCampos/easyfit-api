@@ -22,6 +22,11 @@ export class ClassesController {
     return this.classesService.findStudentClassesByEmail(email)
   }
 
+  @Get('/professional_rating')
+  getProfessionalRating(@Query('id', ParseUUIDPipe) id: string) {
+    return this.classesService.getProfessionalAverageRating(id)
+  }
+
   @Get('/professional_classes')
   findProfessionalClasses(@Query('id', ParseUUIDPipe) id: string, @Query('day') day: string) {
     if (day) {
@@ -37,8 +42,8 @@ export class ClassesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateClassDto: UpdateClassDto) {
-    return this.classesService.update(+id, updateClassDto);
+  updateRating(@Param('id') id: string, @Query('rating') rating: number) {
+    return this.classesService.updateClassRating(id, rating);
   }
 
   @Delete(':id')

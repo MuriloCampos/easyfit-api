@@ -33,6 +33,9 @@ export class Class {
   @Column()
   datetime: Date;
 
+  @Column()
+  rating?: number;
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
@@ -44,10 +47,12 @@ export class Class {
     professional?: Professional,
     sport?: Sport,
     datetime?: string,
+    rating?: number,
   ) {
     this.student = student;
     this.professional = professional;
     this.sport = sport;
     this.datetime = new Date(datetime);
+    this.rating = rating;
   }
 }
