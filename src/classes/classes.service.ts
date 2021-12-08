@@ -26,13 +26,36 @@ export class ClassesService {
     const sport = await this.sportsService.findOne(sport_id)
     const student = await this.studentsService.findOneByEmail(student_email)
 
-    const newClass = new Class(student, professional, sport, class_datetime)
-    console.log(createClassDto)
+    const newClass = new Class(student, professional, sport, class_datetime, -1)
     return this.classesRepository.save(newClass);
   }
 
   findAll() {
     return `This action returns all classes`;
+  }
+
+  async updateClassRating(classId: string, newRating: number) {
+    const currentClass = await this.classesRepository.findOne({ id: classId })
+
+    currentClass.rating = newRating
+
+    return this.classesRepository.save(currentClass)
+  }
+
+  async getProfessionalAverageRating(professional_id: string) {
+    const professional = await this.professionalsService.findOne(professional_id)
+    const allClasses = await this.classesRepository.find({ professional })
+    let totalValidRating = 0
+    let totalRatedClasses = 0
+
+    allClasses.forEach(classItem => {
+      if (classItem.rating > 0) {
+        totalRatedClasses += 1
+        totalValidRating += classItem.rating
+      }
+    })
+
+    return totalRatedClasses > 0 ? totalValidRating / totalRatedClasses : -1
   }
 
   async findStudentClassesByEmail(email: string) {
@@ -56,7 +79,10 @@ export class ClassesService {
       where: {
         professional,
         datetime: isSameDay(day)
-      }
+      },
+      order: {
+        datetime: 'DESC'
+      },
     })
   }
 

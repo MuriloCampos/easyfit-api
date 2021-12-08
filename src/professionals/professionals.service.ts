@@ -84,7 +84,6 @@ export class ProfessionalsService {
   }
 
   async findByFilter(filters) {
-    console.log(filters);
     const skippedItems = (filters.page - 1) * this.ITEMS_PER_PAGE;
 
     if (filters.sport && !filters.name) {
